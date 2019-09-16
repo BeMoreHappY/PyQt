@@ -1,22 +1,75 @@
 from PyQt5 import QtWidgets
 import database
-
-
-from MainUi import Ui_MainWindow
+from datetime import datetime
+import time
+from Main_window import Ui_MainWindow
 from dialog import Ui_Dialog
 from dialog2 import  Ui_Dialog2     # Ładujemy główną stronę
 
 
 
 
-class MyWindows(QtWidgets.QMainWindow):
+class MyWindows(QtWidgets.QMainWindow, Ui_MainWindow):
     """
     QMainWindows - Klasa rodzica, która służy do obsługi głownego okna aplikacji
     """
+    def __init__(self, parent=None):
+        super().__init__()
+        self.setupUi(self)
+        self.Append_btn.clicked.connect(self.enter_data)
+
+    def enter_data(self):
+
+        if self.pet_name_unknow.checkState() == 0:
+            pet_name = self.pet_name.text()
+            if pet_name == "":
+                return QtWidgets.QMessageBox.warning(self, 'Warning', 'Enter the name or check the box!')
+
+        else:
+            pet_name = "Unknown"
+
+        if self.breed_unknow.checkState() == 0:
+            breed = self.breed.currentText()
+        else:
+            breed = "Unknown"
+
+        if self.date_born_unknow.checkState() == 0:
+            born_date = self.date_born.text()
+            today = datetime.today().strftime("%d.%m.%Y")
+            set_data = time.strptime(born_date, "%d.%m.%Y")
+            new_today = time.strptime(today, "%d.%m.%Y")
+            if new_today < set_data:
+                return QtWidgets.QMessageBox.warning(self, 'Warning', 'Invalid date!')
+
+
+
+        else:
+            born_date = "Unknown"
+
+
+        sex = self.sex.currentText()
+
+        if database.addToDbAnimals(pet_name, breed, born_date, sex) == True:
+            QtWidgets.QMessageBox.information(self, "Information", "Zwierzak został dodany!")
+
+class Baza(MyWindows):
     def __init__(self):
         super().__init__()
-        self.ui = Ui_MainWindow()
-        self.ui.setupUi(self)
+
+class Status(MyWindows):
+    def __init__(self):
+        super().__init__()
+
+
+
+
+
+
+
+
+
+
+
 
 class Register(QtWidgets.QDialog, Ui_Dialog2):
     def __init__(self, parent=None):
@@ -79,7 +132,7 @@ if __name__ == "__main__":
     if login.exec_() == QtWidgets.QDialog.Accepted:
         window = MyWindows()
         window.show()
-        window.resize(1300, 1000)
+        window.resize(800, 600)
         sys.exit(app.exec_())
 
 

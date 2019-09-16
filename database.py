@@ -28,9 +28,15 @@ def addToDb(email, username, password):
     mydb.commit()
     return True
 
+def addToDbAnimals(name, breed, born_date, sex):
+    query = "INSERT INTO Animals (Name, Breed, Date, Sex) VALUE (%s, %s, %s , %s)"
+    mycursor.execute(query, (name, breed, born_date, sex))
+    mydb.commit()
+    return True
 
 
 
+l
 
 
 
